@@ -2,10 +2,10 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.keras.utils import load_img, img_to_array
 
-# Modeli yükle
+# Load the trained model
 model = tf.keras.models.load_model('fruits_model.h5')
 
-# 2. Sınıf isimlerini DÜZELTİLMİŞ liste (Virgüllere dikkat!)
+# 2. Class names list 
 class_names = [
     'Avocado 1', 
     'Banana 1',
@@ -19,27 +19,37 @@ class_names = [
     'Watermelon 1'
 ]
 
-# Resim yolu
+# Image path
 img_path = 'fruits/cabbage.jpeg'
 
 try:
+    # Load and resize the image
     img = load_img(img_path, target_size=(100, 100))
+    
+    # Convert image to array and normalize pixel values
     img_array = img_to_array(img) / 255.0
+    
+    # Expand dimensions to match model input shape (batch size = 1)
     img_array = np.expand_dims(img_array, axis=0)
 
+    # Run inference
     predictions = model.predict(img_array)
     
-    # Modelin ham çıktılarını görmek için (Hata ayıklama amaçlı)
-    print(f"Ham Tahminler: {predictions}") 
+    # Print raw model outputs (for debugging purposes)
+    print(f"Raw Predictions: {predictions}") 
     
+    # Get the index of the class with the highest confidence
     score_index = np.argmax(predictions[0])
-    tahmin_edilen = class_names[score_index]
-    guven_orani = 100 * predictions[0][score_index]
+    
+    # Get predicted class name and confidence score
+    predicted_class = class_names[score_index]
+    confidence_score = 100 * predictions[0][score_index]
 
     print("-" * 30)
-    print(f"Result: {tahmin_edilen}")
-    print(f"Accuracy: %{guven_orani:.2f}")
+    print(f"Result: {predicted_class}")
+    print(f"Accuracy: %{confidence_score:.2f}")
     print("-" * 30)
 
 except Exception as e:
+    # Handle and print any errors
     print(f"ERROR!: {e}")
